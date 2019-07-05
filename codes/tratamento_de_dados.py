@@ -94,8 +94,8 @@ pipeline = Pipeline(stages=[regexTokenizer, stopwordsRemover])
 
 # Fit the pipeline to training dataset
 pipelineFit = pipeline.fit(cnpj)
-dataset = pipelineFit.transform(cnpj)
-dataset.show(5)
+cnpj = pipelineFit.transform(cnpj)
+cnpj.show(5)
 
 # count and filter words most commom 
 cnpj = cnpj.withColumn('empresa', SF.lower(SF.col('NOME_EMPRESA')))
@@ -107,37 +107,49 @@ wordcount = cnpj.withColumn('class_words', SF.explode(SF.split(SF.col('empresa')
 
 # filter count and STOPWORD
 wordcount = wordcount.filter(wordcount['count'] > 5000 )
-wordcount.show()
 
 # create LIST OF WORDS MOST COMMOM
 x = wordcount.select("class_words").rdd.flatMap(lambda x: x).collect()
-lst = SF.array(x)
-import numpy as np 
-#x = np.array(x)
-x.append('petiscos')
+x = x + ['lanchonete', 'bar']
 
+'''
+ADICIONAR COLUNA COM A LISTA DE COUNT NA BASE
+CRIAR VERIFICACAO COM BASE NAS COLUNAS
+'''
 
 # create column of word class 
 @SF.udf
-def countInLists(feature_list, label_list): # GAMBIARRA WORKING:
-    #label_list = ['ltda', 'de', 'e', 'restaurante', 'eireli', 'comercio',
-    #  'alimentos', 'da', 'silva', '&', 'lanchonete',
-    # 'pamonharia', 'lachonete', 'lanchonete', 'bar', 'petiscos']
+def countInLists(feature_list): # GAMBIARRA WORKING:
+    label_list = ['ltda', 'de', 'e', 'restaurante', 'eireli', 'comercio',
+      'alimentos', 'da', 'silva', '&', 'lanchonete',
+     'pamonharia', 'lachonete', 'lanchonete', 'bar', 'petiscos']
     class_words = []
     for label in label_list:
         if label in feature_list:
             class_words.append(label)
-    return class_words
+    if class_words:
+        return class_words
+    else:
+        class_words.append(None)
+        return class_words
 
-#dataset.withColumn("testando", countInLists('filtered')).show(5)
+cnpj = cnpj.withColumn("classes", countInLists('filtered'))
+cnpj.select('classes').show(20)
 
-'''
-ADICIONAR COLUNA COM A LISTA DE COUNT NA BASE
+cnpj = cnpj \
+    .withColumn("row_id", SF.monotonically_increasing_id())
 
-CRIAR VERIFICACAO COM BASE NAS COLUNAS
+exploded = cnpj \
+    .select(SF.col("CNPJ"),
+            SF.explode("filtered") \
+               .alias("classes"))
 
-'''
+exploded.show()
 
+# CREATE SELECTOR COLUMN WITH WORDCOUNT AND FILTER DATA
+
+
+# PIVOT EXPLODED AND MERGE WITH CNPJdata
 
 #-------------- mineracao de texto do nome fantasia [palavras comuns]
 
