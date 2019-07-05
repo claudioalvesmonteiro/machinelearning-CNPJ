@@ -116,26 +116,27 @@ import numpy as np
 #x = np.array(x)
 x.append('petiscos')
 
-'''
+
 # create column of word class 
 @SF.udf
-def countInLists(feature_list): # GAMBIARRA WORKING:
-    label_list = ['ltda', 'de', 'e', 'restaurante', 'eireli', 'comercio', 'alimentos', 'da', 'silva', '&', 'lanchonete',
-     'pamonharia', 'lachonete', 'lanchonete', 'bar', 'petiscos']
+def countInLists(feature_list, label_list): # GAMBIARRA WORKING:
+    #label_list = ['ltda', 'de', 'e', 'restaurante', 'eireli', 'comercio',
+    #  'alimentos', 'da', 'silva', '&', 'lanchonete',
+    # 'pamonharia', 'lachonete', 'lanchonete', 'bar', 'petiscos']
     class_words = []
     for label in label_list:
         if label in feature_list:
             class_words.append(label)
     return class_words
 
-dataset.withColumn("testando", countInLists('filtered')).show(5)
+#dataset.withColumn("testando", countInLists('filtered')).show(5)
+
 '''
+ADICIONAR COLUNA COM A LISTA DE COUNT NA BASE
 
-from functools import partial
+CRIAR VERIFICACAO COM BASE NAS COLUNAS
 
-
-test = dataset.withColumn('classe_palavras', countInLists('filtered', x))
-test.show()
+'''
 
 
 #-------------- mineracao de texto do nome fantasia [palavras comuns]
