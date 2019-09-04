@@ -1,0 +1,14 @@
+from pyspark.ml.feature import StringIndexerModel
+
+# A simple monkey patch so we don't have to _call_java later 
+def labels(self):
+    return self._call_java("labels")
+
+StringIndexerModel.labels = labels
+
+# Fit indexer model
+indexer = StringIndexer(inputCol="category", outputCol="categoryIndex").fit(df)
+
+# Extract mapping
+mapping = dict(enumerate(indexer.labels()))
+mapping

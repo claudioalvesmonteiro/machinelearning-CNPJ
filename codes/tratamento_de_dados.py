@@ -65,16 +65,16 @@ dt.show(5)
 #------ create dataset without duplicates
 cnpj = df.dropDuplicates(['CNPJ'])
 
-#------ create feature
-features = cnpj.select('CNPJ', 'CAPITAL_SOCIAL')
-
 #------ tratar inicio do CNPJ sem o 0
 @SF.udf('string')
 def fillCNPJ(value):
     aux = '00000000000000' + value
     return aux[len(value):]
 
-features = features.withColumn('CNPJ', fillCNPJ('CNPJ'))
+cnpj = cnpj.withColumn('CNPJ', fillCNPJ('CNPJ'))
+
+#------ create feature
+features = cnpj.select('CNPJ', 'CAPITAL_SOCIAL')
 
 #--------- mineracao de texto do nome da empresa [palavras comuns]
 # https://towardsdatascience.com/multi-class-text-classification-with-pyspark-7d78d022ed35
@@ -133,6 +133,7 @@ def countInLists(feature_list): # GAMBIARRA WORKING:
         class_words.append(None)
         return class_words
 
+
 cnpj = cnpj.withColumn("classes", countInLists('filtered'))
 cnpj.select('classes').show(20)
 
@@ -159,25 +160,23 @@ exploded.show()
 
 # criar colunas 0-1 com ATIVIDADES_SECUNDARIAS > 1
 
-# criar colunas 0-1 com TIPO 
+# [VIRGINIA] criar colunas 0-1 com TIPO 
 
 # mineracao de texto do COMPLEMENTO [LOJA, AP...] 
 
 # quantos telefones possui (TELEFONE_1 e TELEFONE_2)
 
-# possui EMAIL 0-1
+# [VIRGINIA] possui EMAIL 0-1
 
 # tempo de existencia data hoje-ABERTURA
 
-# criar colunas 0-1 com TIPO 
-
 # contar numero de socios por CNPJ 
 
-# mineracao de texto do NOME_SOCIO [prop. de mulher do total] 
+# [CLAUDIO] mineracao de texto do NOME_SOCIO [prop. de mulher do total] 
 
-#--- explorar dados por CNPJ
+#--- explorar dados por CNPJ [ROSE]
 
-#--- explorar dados por CEP
+#--- explorar dados por CEP [MARCOS]
 
-#--- explorardados por MUNICIPIO
+#--- explorar dados por MUNICIPIO [KAYO]
 
